@@ -4,6 +4,11 @@
 ### Changes
 - Sample Text
 
+## [1.3.2]
+### Changes
+- Updated and added some mods
+- Cleaned up readme
+
 ## [1.3.1]
 ### Changes
 - Cleaned out KubeJS and config folders for easier importing
