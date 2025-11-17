@@ -5,6 +5,7 @@ Like the previous template pack, this is a simple "pack" meant to save you time.
 - Pakku:
    - Easily control mods and resourcepacks, handling dependendices for you.
       - Mods can be pulled from Curseforge, Modrinth, and even Github releases!
+        - [Manual overrides work as well](https://juraj-hrivnak.github.io/Pakku/adding-manual-overrides.html)
       - Mods and folders can be easily marked as client or serverside only, or even to [not export at all](https://github.com/ThePansmith/PanPack/blob/cfda140750ebd454094415e32a4f971d49153428/pakku.json#L31C1-L34C10)!
    - Simultaneous Curseforge and Modrinth Modpack Support[^1]
    - Mods can be easily fetched (more on that below)
