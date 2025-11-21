@@ -1,5 +1,10 @@
-# PanPack Template
-Like the previous template pack, this is a simple "pack" meant to save you time. This time, it's geared more towards pack developers, being built off of pakku, now featuring automatic linting, autofetching mods, and more!
+<p align="center"><img src="https://media.forgecdn.net/avatars/798/822/638160732420962168.png" height="250" alt="Logo"></p>
+<h1 align="center">PanPack</h1>
+<p align="center"><b><i>A template for the modern modpacker, featuring automatic mod updating, autolinting, build/release scripts, simple setup and more.</i></b></p>
+<h1 align="center">
+    <a href="https://github.com/ThePansmith/PanPack/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/ThePansmith/PanPack?style=for-the-badge&logo=github" alt="License"></a>
+    <a href="https://discord.com/invite/zwQzqP8b6q"><img src="https://img.shields.io/discord/927050775073534012?style=for-the-badge&logo=discord&color=5865F2&labelColor=grey&label=+" alt="Discord"></a>
+</h1>
 
 ## Features
 - Pakku:
@@ -34,17 +39,19 @@ Like the previous template pack, this is a simple "pack" meant to save you time.
 
 ## Setup
 ### As a template 
-1. Clone your fork of this template into an empty [`(instancename)\minecraft`](https://github.com/user-attachments/assets/f9de6554-925d-4827-b51c-c7159e6f915f) folder
+1. Clone your copy of this template into an empty [`(instancename)\minecraft`](https://github.com/user-attachments/assets/f9de6554-925d-4827-b51c-c7159e6f915f) folder
 2. Copy the contents of `(instancename)\minecraft\.pakku\prism-overrides`[^2] into your `(instancename)` folder to have a working [Prism Instance](https://prismlauncher.org/).[^3]
 
 
 By default, the pack comes with a set of mods most packdevs find useful (optimization mods, KubeJS, Jade, etc); To add your mods and resourcepacks, open the project's /minecraft/ folder in a terminal (using a code editor such as VSC is recommended), and run [`java -jar pakku.jar add [<options>] [<projects>]`](https://juraj-hrivnak.github.io/Pakku/managing-projects.html#adding-projects). Pakku will handle dependencies for you.
 
 ### Importing into an existing repository
-1. In your `/minecraft/` folder, ensure that you have one of the following available: `manifest.json` `modrinth.index.json` `.mrpack`, or a curseforge `.zip` file. (You can generate one with Prism)
-2. Clone the panpack template somewhere, copy over everything but `pakku-lock.json` (and `.gitattributes` and .git folder, of course), you can delete the template afterwards.
+1. In your existing minecraft instance's `/minecraft/` folder, ensure that you have one of the following available: `manifest.json` `modrinth.index.json` `.mrpack`, or a curseforge `.zip` file. [(You can generate one with Prism)](https://github.com/user-attachments/assets/88f3518d-604f-46d9-a319-775c6daa05cb)
+2. Clone the panpack template somewhere, copy over everything but `pakku-lock.json` (and `.gitattributes` and .git folder, of course)
 3. Open up your terminal, [change directory](https://www.wikihow.com/images/thumb/0/08/Change-Directories-in-Command-Prompt-Step-7-Version-2.jpg/v4-460px-Change-Directories-in-Command-Prompt-Step-7-Version-2.jpg.webp) to your instance's `/minecraft/` folder, and run [`java -jar pakku.jar import <file from step 1>`](https://juraj-hrivnak.github.io/Pakku/managing-projects.html#adding-projects)
 4. Edit `minecraft/pakku.json`, and `minecraft/.pakku/prism-overrides/` as applicable, and add `java -jar pakku.jar fetch` to your instance's [prelaunch commands](https://github.com/user-attachments/assets/494a632d-1af4-453d-9329-5454ac3d22da)
+
+Don't forget to link to this page in your README so contributors will know how to set up their own instance!
 
 ### Contributing to an existing repository that uses this template
 1. Clone your fork of the repository into an empty [`(instancename)\minecraft`](https://github.com/user-attachments/assets/f9de6554-925d-4827-b51c-c7159e6f915f) folder, and copy the contents of `(instancename)\minecraft\.pakku\prism-overrides` into your `(instancename)` folder to have a working Prism Instance. From there, you can start your newly created instances and the mods will be downloaded for you.[^3]
@@ -63,7 +70,7 @@ By default, the pack comes with a set of mods most packdevs find useful (optimiz
 
 
 ### Building and releasing
-Before you can run the buildscripts, you will need to go to the repository's [secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) and add a [`CURSEFORGE_TOKEN`](https://support.curseforge.com/en/support/solutions/articles/9000197321-curseforge-upload-api) secret and `CURSEFORGE_ID` variable. Before releasing, go to [release.yml](https://github.com/ThePansmith/PanPack/blob/main/.github/workflows/build-release.yml), and change anything that's commented with "Change this!"
+Before you can run the buildscripts, you will need to go to the repository's [secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) and add a [`CURSEFORGE_TOKEN`](https://support.curseforge.com/en/support/solutions/articles/9000197321-curseforge-upload-api) secret and [`CURSEFORGE_ID`](https://github.com/user-attachments/assets/39fc3911-ee6a-4152-a433-be166896d5cd) variable. Before releasing, go to [release.yml](https://github.com/ThePansmith/PanPack/blob/main/.github/workflows/build-release.yml), and change anything that's commented with "Change this!"
 
 ## Usage
 * To initate a release, update `CHANGELOG.MD` with a new version, [Unreleased] can be used as a staging ground for changes.

@@ -4,6 +4,11 @@
 ### Changes
 - Sample Text
 
+## [1.3.3]
+### Changes
+- Fixed autofetch command not being automatically applied
+- Added more information to the readme
+
 ## [1.3.2]
 ### Changes
 - Updated and added some mods
