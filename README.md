@@ -29,6 +29,9 @@ Like the previous template pack, this is a simple "pack" meant to save you time.
    - Issue and PR templates
    - .gitignore (including some mod configs that add a last edited date)
 
+### Requirements
+* This template was written with [Prism Launcher](https://prismlauncher.org/) in mind. Those using other launchers will need to adjust setup instructions as needed to allow their launcher to recognize the template as an instance. Launchers without the ability to set prelaunch commands will need to fetch mods manually (see below).
+
 ## Setup
 ### As a template 
 1. Clone your fork of this template into an empty [`(instancename)\minecraft`](https://github.com/user-attachments/assets/f9de6554-925d-4827-b51c-c7159e6f915f) folder
