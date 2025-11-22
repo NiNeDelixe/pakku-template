@@ -67,8 +67,7 @@ jobs:
         run: |
           tag=$(git describe --tags --abbrev=0 origin/main)
           if [ -z "$tag" ]; then
-            echo "Latest tag not found, likely the first time this script has been ran. Falling back to 0.0.0"
-            echo "tag=0.0.0" >> $GITHUB_OUTPUT
+            echo "Latest tag not found, likely the first time this script has been ran. " && exit 1
           else
             echo "Latest tag found: $tag"
             echo "tag=$tag" >> $GITHUB_OUTPUT
