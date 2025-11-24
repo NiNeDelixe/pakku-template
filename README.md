@@ -70,7 +70,14 @@ Don't forget to link to this page in your README so contributors will know how t
 
 
 ### Building and releasing
-Before you can run the buildscripts, you will need to go to the repository's [secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) and add a [`CURSEFORGE_TOKEN`](https://support.curseforge.com/en/support/solutions/articles/9000197321-curseforge-upload-api) secret and [`CURSEFORGE_ID`](https://github.com/user-attachments/assets/39fc3911-ee6a-4152-a433-be166896d5cd) variable. Before releasing, go to [release.yml](https://github.com/ThePansmith/PanPack/blob/main/.github/workflows/build-release.yml), and change anything that's commented with "Change this!"
+Before you can run the buildscripts, you will need to go to the repository's [secrets and variables](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) and add [`CURSEFORGE_TOKEN`](https://support.curseforge.com/en/support/solutions/articles/9000197321-curseforge-upload-api) into secrets and [`CURSEFORGE_ID`](https://github.com/user-attachments/assets/39fc3911-ee6a-4152-a433-be166896d5cd) into variables. Before releasing, go to [release.yml](https://github.com/ThePansmith/PanPack/blob/main/.github/workflows/build-release.yml), and change anything that's commented with "Change this!"
+
+Also, ensure that your pakku.json has the following variables:
+
+```json
+    "version": "DEV", // Leave this as dev, it will be replaced when the project is built. Don't include these comments in your actual pakku.json file.
+    "release_type": "alpha", // or beta, or release. This one is used to tell curseforge the release type.
+```
 
 ## Usage
 * To initate a release, update `CHANGELOG.MD` with a new version, [Unreleased] can be used as a staging ground for changes.
