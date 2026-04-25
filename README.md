@@ -1,7 +1,7 @@
 <h1 align="center">pakku template</h1>
 <p align="center"><b><i>A template for the modern modpacker, featuring automatic mod updating, autolinting, build/release scripts, simple setup and more.</i></b></p>
 <h1 align="center">
-    <a href="https://github.com/NiNeDelixe/pakku-template/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/ThePansmith/PanPack?style=for-the-badge&logo=github" alt="License"></a>
+    <a href="https://github.com/NiNeDelixe/pakku-template/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/NiNeDelixe/pakku-template?style=for-the-badge&logo=github" alt="License"></a>
 </h1>
 
 ## Features
@@ -9,7 +9,7 @@
    - Easily control mods and resourcepacks, handling dependendices for you.
       - Mods can be pulled from Curseforge, Modrinth, and even Github releases!
         - [Manual overrides work as well](https://juraj-hrivnak.github.io/Pakku/adding-manual-overrides.html)
-      - Mods and folders can be easily marked as client or serverside only, or even to [not export at all](https://github.com/ThePansmith/PanPack/blob/cfda140750ebd454094415e32a4f971d49153428/pakku.json#L31C1-L34C10)!
+      - Mods and folders can be easily marked as client or serverside only, or even to [not export at all](https://github.com/NiNeDelixe/pakku-template/blob/cfda140750ebd454094415e32a4f971d49153428/pakku.json#L31C1-L34C10)!
    - Simultaneous Curseforge and Modrinth Modpack Support[^1]
    - Mods can be easily fetched (more on that below)
 - Actions:

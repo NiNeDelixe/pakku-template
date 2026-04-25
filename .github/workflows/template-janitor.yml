@@ -71,18 +71,18 @@ jobs:
           NEW_SAFE_DESCRIPTION="$(echo "$NEW_DESCRIPTION" | sed 's/\\/\\\\/g' | sed 's/|/\\|/g' )"
           echo "NEW_SAFE_DESCRIPTION=$NEW_SAFE_DESCRIPTION" >> $GITHUB_ENV
 
-      - name: Insert new org and project
-        run: |
-          find src include test fuzz_test cmake -type f -exec sed -i "s/pakku/${{ env.NEW_SAFE_PROJECT }}/gi" .github/constants.env CMakeLists.txt Dependencies.cmake ProjectOptions.cmake .github/workflows/ci.yml .github/workflows/codeql-analysis.yml configured_files/config.hpp.in {} +
+      # - name: Insert new org and project
+      #   run: |
+      #     find src include test fuzz_test cmake -type f -exec sed -i "s/pakku/${{ env.NEW_SAFE_PROJECT }}/gi" .github/constants.env CMakeLists.txt Dependencies.cmake ProjectOptions.cmake .github/workflows/ci.yml .github/workflows/codeql-analysis.yml configured_files/config.hpp.in {} +
 
-          sed -i "s|%%pakku_url%%|${{ fromJson(steps.get_repo_meta.outputs.data).html_url }}|gi" CMakeLists.txt
+      #     sed -i "s|%%pakku_url%%|${{ fromJson(steps.get_repo_meta.outputs.data).html_url }}|gi" CMakeLists.txt
 
-          sed -i "s/%%myorg%%/${{ env.NEW_ORG }}/g" ${{ env.TEMPLATES_PATH }}/README.md
-          sed -i "s/%%myproject%%/${{ env.NEW_PROJECT }}/g" ${{ env.TEMPLATES_PATH }}/README.md
-          sed -i "s|%%description%%|$NEW_SAFE_DESCRIPTION|g" ${{ env.TEMPLATES_PATH }}/README.md
+      #     sed -i "s/%%myorg%%/${{ env.NEW_ORG }}/g" ${{ env.TEMPLATES_PATH }}/README.md
+      #     sed -i "s/%%myproject%%/${{ env.NEW_PROJECT }}/g" ${{ env.TEMPLATES_PATH }}/README.md
+      #     sed -i "s|%%description%%|$NEW_SAFE_DESCRIPTION|g" ${{ env.TEMPLATES_PATH }}/README.md
 
-          mv include/pakku include/${{ env.NEW_SAFE_PROJECT }}
-          cp ${{ env.TEMPLATES_PATH }}/README.md README.md
+      #     mv include/pakku include/${{ env.NEW_SAFE_PROJECT }}
+      #     cp ${{ env.TEMPLATES_PATH }}/README.md README.md
 
       - name: Print diff after replacement
         run: |
