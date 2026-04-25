@@ -3,7 +3,7 @@ run-name: "Project Build #${{ github.run_number }}"
 on:
   push:
     branches:
-      - dev
+      - develop
       - main
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -283,7 +283,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 state: 'open',
-                head: `${context.repo.owner}:dev`,
+                head: `${context.repo.owner}:develop`,
                 base: 'main'
               });
 
@@ -299,7 +299,7 @@ jobs:
         uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: dev
+          source_branch: develop
           target_branch: main
           #milestone: ${{ steps.changelog.outputs.version }} # Change this! (if you plan on using milestones)
           ignore_users: "dependabot"

@@ -1,74 +1,192 @@
 name: Template Janitor
 
 on:
+  pull_request:
+  release:
+    types: [published]
   push:
     branches:
       - main
-  workflow_dispatch:
-
+      - develop
+      - dev
 permissions:
   contents: write
 
+env:
+  TEMPLATES_PATH: ".github/template"
+
 jobs:
-  janitor:
-    if: ${{ github.repository_owner != 'ThePansmith' }}
+  template-cleanup:
+    name: Cleanup after create
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler:
+          - gcc-14
+        generator:
+          - "Unix Makefiles"
+        build_type:
+          - Debug
+        packaging_maintainer_mode:
+          - OFF
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
-      - name: Apply template initialization
-        shell: bash
+      - name: Setup Cache
+        uses: ./.github/actions/setup_cache
+        with:
+          compiler: ${{ matrix.compiler }}
+          build_type: ${{ matrix.build_type }}
+          package_maintainer_mode: ${{ matrix.package_maintainer_mode }}
+          generator: ${{ matrix.generator }}
+
+      - name: Get organization and project name
         run: |
-          set -euo pipefail
+          echo "NEW_ORG=${{ github.repository_owner }}" >> $GITHUB_ENV
+          echo "NEW_PROJECT=${{ github.event.repository.name }}" >> $GITHUB_ENV
+          echo "NEW_URL=${{ github.repositoryUrl }}" >> $GITHUB_ENV
 
-          REPO_NAME="${GITHUB_REPOSITORY##*/}"
-          REPO_OWNER="${GITHUB_REPOSITORY%%/*}"
-          TITLE_NAME="$(echo "$REPO_NAME" | tr '-_' '  ' | awk '{for(i=1;i<=NF;i++){$i=toupper(substr($i,1,1)) tolower(substr($i,2))}; print}')"
-
-          if [[ -f "pakku.json" ]]; then
-            tmp_file="$(mktemp)"
-            jq --arg name "$TITLE_NAME" --arg author "$REPO_OWNER" '
-              .name = $name
-              | .author = $author
-            ' pakku.json > "$tmp_file"
-            mv "$tmp_file" pakku.json
-            echo "Updated pakku.json name and author"
-          fi
-
-          if [[ -f "README.md" ]]; then
-            awk -v title="$TITLE_NAME" '
-              BEGIN { updated = 0 }
-              {
-                if (!updated && $0 ~ /^# /) {
-                  print "# " title
-                  updated = 1
-                } else {
-                  print $0
-                }
-              }
-            ' README.md > README.md.tmp && mv README.md.tmp README.md
-            echo "Updated README title"
-          fi
-
-      - name: Commit cleanup changes
-        uses: stefanzweifel/git-auto-commit-action@v6
+      - uses: octokit/request-action@v2.x
+        id: get_repo_meta
         with:
-          commit_message: "chore: initialize repository from template"
-          commit_user_name: github-actions[bot]
-          commit_user_email: github-actions[bot]@users.noreply.github.com
-          branch: ${{ github.ref_name }}
-          file_pattern: "pakku.json README.md .github/workflows/template-janitor.yml"
+          route: GET /repos/${{ env.NEW_ORG }}/${{ env.NEW_PROJECT }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Remove janitor workflow
-        run: rm -f .github/workflows/template-janitor.yml
+      - name: Export description to variable
+        if: fromJson(steps.get_repo_meta.outputs.data).is_template == false
+        run: |
+          echo NEW_DESCRIPTION="$(cat <<'do;not(include}this[in%the$description'
+          ${{ fromJson(steps.get_repo_meta.outputs.data).description }}
+          do;not(include}this[in%the$description
+          )" >> $GITHUB_ENV
 
-      - name: Commit janitor self-removal
-        uses: stefanzweifel/git-auto-commit-action@v6
+      - name: Use testing variables if still a template
+        if: fromJson(steps.get_repo_meta.outputs.data).is_template == true
+        run: |
+          echo "NEW_PROJECT=my-unsafe.pakku" >> $GITHUB_ENV
+          NEW_DESCRIPTION=$(cat <<'EOF'
+          Unsafe because of "quotes" and unbalanced "quotes ('Also' 'unbalanced single). The sed uses | and used to have /. Variable expansion might be bad $GITHUB_ENV as well. Also \ should stay.
+          EOF
+          )
+          echo NEW_DESCRIPTION="$NEW_DESCRIPTION" >> $GITHUB_ENV
+
+      - name: Add safe replacement variable versions
+        run: |
+          NEW_SAFE_PROJECT=$(echo ${{ env.NEW_PROJECT }} | sed "s/-/_/g" | sed "s/\./_/g" )
+          echo "NEW_SAFE_PROJECT=$NEW_SAFE_PROJECT" >> $GITHUB_ENV
+          NEW_SAFE_DESCRIPTION="$(echo "$NEW_DESCRIPTION" | sed 's/\\/\\\\/g' | sed 's/|/\\|/g' )"
+          echo "NEW_SAFE_DESCRIPTION=$NEW_SAFE_DESCRIPTION" >> $GITHUB_ENV
+
+      - name: Insert new org and project
+        run: |
+          find src include test fuzz_test cmake -type f -exec sed -i "s/pakku/${{ env.NEW_SAFE_PROJECT }}/gi" .github/constants.env CMakeLists.txt Dependencies.cmake ProjectOptions.cmake .github/workflows/ci.yml .github/workflows/codeql-analysis.yml configured_files/config.hpp.in {} +
+
+          sed -i "s|%%pakku_url%%|${{ fromJson(steps.get_repo_meta.outputs.data).html_url }}|gi" CMakeLists.txt
+
+          sed -i "s/%%myorg%%/${{ env.NEW_ORG }}/g" ${{ env.TEMPLATES_PATH }}/README.md
+          sed -i "s/%%myproject%%/${{ env.NEW_PROJECT }}/g" ${{ env.TEMPLATES_PATH }}/README.md
+          sed -i "s|%%description%%|$NEW_SAFE_DESCRIPTION|g" ${{ env.TEMPLATES_PATH }}/README.md
+
+          mv include/pakku include/${{ env.NEW_SAFE_PROJECT }}
+          cp ${{ env.TEMPLATES_PATH }}/README.md README.md
+
+      - name: Print diff after replacement
+        run: |
+          git diff ':!README.md'
+          diff ${{ env.TEMPLATES_PATH }}/README.md README.md
+
+      - name: Remove unwanted files
+        run: |
+          xargs rm -r < ${{ env.TEMPLATES_PATH }}/removal-list
+
+      - name: Clean up before commit and push
+        run: |
+          rm -r ${{ env.TEMPLATES_PATH }}
+          rm .github/workflows/template-janitor.yml
+
+      - name: Project Name
+        uses: cardinalby/export-env-action@v2
         with:
-          commit_message: "chore: remove template janitor workflow"
-          commit_user_name: github-actions[bot]
-          commit_user_email: github-actions[bot]@users.noreply.github.com
-          branch: ${{ github.ref_name }}
-          file_pattern: ".github/workflows/template-janitor.yml"
+          envFile: '.github/constants.env'
+
+      - uses: EndBug/add-and-commit@v10
+        if: fromJson(steps.get_repo_meta.outputs.data).is_template != true
+        with:
+          add: -A
+          author_name: Template Janitor
+          author_email: template.janitor@example.com
+          message: 'Cleanup template and initialize repository'
+          pathspec_error_handling: exitImmediately
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  template-rename:
+    name: Renames Pakku template when a new name is detected
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler:
+          - gcc-11
+        generator:
+          - "Unix Makefiles"
+        build_type:
+          - Debug
+        packaging_maintainer_mode:
+          - ON
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Cache
+        uses: ./.github/actions/setup_cache
+        with:
+          compiler: ${{ matrix.compiler }}
+          build_type: ${{ matrix.build_type }}
+          packaging_maintainer_mode: ${{ matrix.packaging_maintainer_mode }}
+          generator: ${{ matrix.generator }}
+
+      - name: Get organization and project name
+        run: |
+          echo "TEST_RUN=false" >> $GITHUB_ENV
+          echo "NEW_ORG=${{ github.repository_owner }}" >> $GITHUB_ENV
+          echo "NEW_PROJECT=${{ github.event.repository.name }}" >> $GITHUB_ENV
+          echo "NEW_REPOSITORY=${{ github.repository }}" >> $GITHUB_ENV
+          echo "TEMPLATE_NAME=`cat ${{ env.TEMPLATES_PATH }}/template_name`" >> $GITHUB_ENV
+          echo "TEMPLATE_REPOSITORY=`cat ${{ env.TEMPLATES_PATH }}/template_repository`" >> $GITHUB_ENV
+
+      - uses: octokit/request-action@v2.x
+        id: get_repo_meta
+        with:
+          route: GET /repos/${{ env.NEW_ORG }}/${{ env.NEW_PROJECT }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup fake test org/project names if project didn't change
+        if: env.TEMPLATE_NAME == env.NEW_PROJECT
+        run: |
+          echo "TEST_RUN=true" >> $GITHUB_ENV
+          echo "NEW_ORG=${{ github.repository_owner }}" >> $GITHUB_ENV
+          echo "NEW_PROJECT=TEST_PAKKU" >> $GITHUB_ENV
+          echo "NEW_REPOSITORY=TEST_PAKKU_REPO" >> $GITHUB_ENV
+
+      - name: Update repository to match new template information
+        run: |
+          sed -i "s|${{ env.TEMPLATE_REPOSITORY }}|${{ env.NEW_REPOSITORY }}|g" README.md ${{ env.TEMPLATES_PATH }}/template_repository
+          sed -i "s|${{ env.TEMPLATE_NAME }}|${{ env.NEW_PROJECT }}|g" README.md ${{ env.TEMPLATES_PATH }}/template_name
+
+      - name: Print diff after template name replacement
+        run: |
+          git diff
+
+      - uses: EndBug/add-and-commit@v10
+        if: fromJson(steps.get_repo_meta.outputs.data).is_template == true && env.TEST_RUN == 'false'
+        with:
+          add: -A
+          author_name: Template Janitor
+          author_email: template.janitor@example.com
+          message: 'Rename template'
+          pathspec_error_handling: exitImmediately
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
