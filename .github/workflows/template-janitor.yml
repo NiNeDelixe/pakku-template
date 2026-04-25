@@ -1,0 +1,74 @@
+name: Template Janitor
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  janitor:
+    if: ${{ github.repository_owner != 'ThePansmith' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Apply template initialization
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          REPO_OWNER="${GITHUB_REPOSITORY%%/*}"
+          TITLE_NAME="$(echo "$REPO_NAME" | tr '-_' '  ' | awk '{for(i=1;i<=NF;i++){$i=toupper(substr($i,1,1)) tolower(substr($i,2))}; print}')"
+
+          if [[ -f "pakku.json" ]]; then
+            tmp_file="$(mktemp)"
+            jq --arg name "$TITLE_NAME" --arg author "$REPO_OWNER" '
+              .name = $name
+              | .author = $author
+            ' pakku.json > "$tmp_file"
+            mv "$tmp_file" pakku.json
+            echo "Updated pakku.json name and author"
+          fi
+
+          if [[ -f "README.md" ]]; then
+            awk -v title="$TITLE_NAME" '
+              BEGIN { updated = 0 }
+              {
+                if (!updated && $0 ~ /^# /) {
+                  print "# " title
+                  updated = 1
+                } else {
+                  print $0
+                }
+              }
+            ' README.md > README.md.tmp && mv README.md.tmp README.md
+            echo "Updated README title"
+          fi
+
+      - name: Commit cleanup changes
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "chore: initialize repository from template"
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          branch: ${{ github.ref_name }}
+          file_pattern: "pakku.json README.md .github/workflows/template-janitor.yml"
+
+      - name: Remove janitor workflow
+        run: rm -f .github/workflows/template-janitor.yml
+
+      - name: Commit janitor self-removal
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "chore: remove template janitor workflow"
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          branch: ${{ github.ref_name }}
+          file_pattern: ".github/workflows/template-janitor.yml"

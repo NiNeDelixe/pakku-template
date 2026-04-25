@@ -1,9 +1,9 @@
 {
-    "name": "PanPack Template",
+    "name": "pakku-template",
     "version": "DEV",
     "release_type": "release",
     "description": "A template pack",
-    "author": "Pansmith",
+    "author": "Your Name",
     "overrides": [
         "config",
         "defaultconfigs",
@@ -24,31 +24,5 @@
     "client_overrides": [
         "resourcepacks"
     ],
-    "projects": {
-        "legendary-tooltips": {
-            "side": "CLIENT"
-        },
-        "zume": {
-            "side": "CLIENT"
-        },
-        "oculus": {
-            "side": "CLIENT"
-        },
-        "watermedia": {
-            "side": "CLIENT"
-        },
-        "embeddium": {
-            "side": "CLIENT"
-        },
-        "embeddiumplus": {
-            "side": "CLIENT"
-        },
-        "citresewn": {
-            "side": "CLIENT"
-        },
-        "probejs": {
-            "side": "CLIENT",
-            "export": false
-        }
-    }
+    "projects": {}
 }

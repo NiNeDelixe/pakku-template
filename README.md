@@ -1,9 +1,7 @@
-<p align="center"><img src="https://media.forgecdn.net/avatars/798/822/638160732420962168.png" height="250" alt="Logo"></p>
-<h1 align="center">PanPack</h1>
+<h1 align="center">pakku template</h1>
 <p align="center"><b><i>A template for the modern modpacker, featuring automatic mod updating, autolinting, build/release scripts, simple setup and more.</i></b></p>
 <h1 align="center">
-    <a href="https://github.com/ThePansmith/PanPack/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/ThePansmith/PanPack?style=for-the-badge&logo=github" alt="License"></a>
-    <a href="https://discord.com/invite/zwQzqP8b6q"><img src="https://img.shields.io/discord/927050775073534012?style=for-the-badge&logo=discord&color=5865F2&labelColor=grey&label=+" alt="Discord"></a>
+    <a href="https://github.com/NiNeDelixe/pakku-template/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/ThePansmith/PanPack?style=for-the-badge&logo=github" alt="License"></a>
 </h1>
 
 ## Features
@@ -38,6 +36,10 @@
 * This template was written with [Prism Launcher](https://prismlauncher.org/) in mind. Those using other launchers will need to adjust setup instructions as needed to allow their launcher to recognize the template as an instance. Launchers without the ability to set prelaunch commands will need to fetch mods manually (see below).
 
 ## Setup
+### As a standalone template
+1. Clone repository
+2. Change mc and loader version with [`java -jar pakku.jar set -v <mc_version> -l <loader>=<loader_version>`](#) command or import exist modpack
+
 ### As a template 
 1. Clone your copy of this template into an empty [`(instancename)\minecraft`](https://github.com/user-attachments/assets/f9de6554-925d-4827-b51c-c7159e6f915f) folder
 2. Copy the contents of `(instancename)\minecraft\.pakku\prism-overrides`[^2] into your `(instancename)` folder to have a working [Prism Instance](https://prismlauncher.org/).[^3]
